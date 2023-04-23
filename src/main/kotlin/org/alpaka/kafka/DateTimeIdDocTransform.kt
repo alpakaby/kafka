@@ -12,7 +12,7 @@ import java.util.*
 @Suppress("TooManyFunctions")
 abstract class DateTimeIdDocTransform<R : ConnectRecord<R>?> : Transformation<R> {
     companion object {
-        val OVERVIEW_DOC = "Convert internal 1C 7.7 DATE_TIME_IDDOC field to DateTime."
+        const val OVERVIEW_DOC = "Convert internal 1C 7.7 DATE_TIME_IDDOC field to DateTime."
 
         val CONFIG_DEF: ConfigDef = ConfigDef()
             .define(
@@ -30,6 +30,12 @@ abstract class DateTimeIdDocTransform<R : ConnectRecord<R>?> : Transformation<R>
             )
 
         private const val PURPOSE = "date-time-iddoc-convert"
+
+        private const val DATE_PART_START = 0
+        private const val DATE_PART_END = 8
+        private const val TIME_PART_END = 14
+        private const val TIME_RADIX = 36
+        private const val TIME_ROUND = 10000
     }
 
     private val formatter = SimpleDateFormat("yyyyMMdd")
@@ -92,8 +98,8 @@ abstract class DateTimeIdDocTransform<R : ConnectRecord<R>?> : Transformation<R>
     }
 
     private fun convert(value: String): String {
-        val datePart = value.substring(0, 8)
-        val timePart = value.substring(8, 14).toLong(36) / 10000
+        val datePart = value.substring(DATE_PART_START, DATE_PART_END)
+        val timePart = value.substring(DATE_PART_END, TIME_PART_END).toLong(TIME_RADIX) / TIME_ROUND
 
         val date = formatter.parse(datePart).toInstant()
 

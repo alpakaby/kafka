@@ -14,10 +14,16 @@ import kotlin.math.absoluteValue
 
 class EntryTransform<R : ConnectRecord<R>?> : Transformation<R> {
     companion object {
-        val OVERVIEW_DOC = "Transforms internal 1C 7.7 entries information to leftover table format"
+        const val OVERVIEW_DOC = "Transforms internal 1C 7.7 entries information to leftover table format"
         val CONFIG_DEF: ConfigDef = ConfigDef()
 
         private const val PURPOSE = "entry-convert"
+
+        private const val DATE_PART_START = 0
+        private const val DATE_PART_END = 8
+        private const val MARK_PRODUCT = 525
+        private const val MARK_RESERVE = 53074
+        private const val INT_RADIX = 36
     }
 
     private val inputFormatter = SimpleDateFormat("yyyyMMdd")
@@ -77,7 +83,7 @@ class EntryTransform<R : ConnectRecord<R>?> : Transformation<R> {
             .build()
 
         val id = value.getInt32("ROW_ID")
-        val date = inputFormatter.parse(value.getString("DATE_TIME_DOCID").substring(0, 8))
+        val date = inputFormatter.parse(value.getString("DATE_TIME_DOCID").substring(DATE_PART_START, DATE_PART_END))
         var reserve = false
         val qty = value.getFloat64("AMOUNT").absoluteValue.toInt()
         val price = value.getFloat64("SUM_").absoluteValue / qty
@@ -85,28 +91,28 @@ class EntryTransform<R : ConnectRecord<R>?> : Transformation<R> {
         var source: Int? = null
         var target: Int? = null
 
-        if (value.getInt32("VKTSC0") == 525) {
-            reserve = value.getInt32("VKTSC1") == 53074
+        if (value.getInt32("VKTSC0") == MARK_PRODUCT) {
+            reserve = value.getInt32("VKTSC1") == MARK_RESERVE
 
             val warehouse = when {
                 reserve -> "KTSC2"
                 else -> "KTSC1"
             }
 
-            product = value.getString("KTSC0").trim().toInt(36)
-            source = value.getString(warehouse).trim().toInt(36)
+            product = value.getString("KTSC0").trim().toInt(INT_RADIX)
+            source = value.getString(warehouse).trim().toInt(INT_RADIX)
         }
 
-        if (value.getInt32("VDTSC0") == 525) {
-            reserve = value.getInt32("VDTSC1") == 53074
+        if (value.getInt32("VDTSC0") == MARK_PRODUCT) {
+            reserve = value.getInt32("VDTSC1") == MARK_RESERVE
 
             val warehouse = when {
                 reserve -> "DTSC2"
                 else -> "DTSC1"
             }
 
-            product = value.getString("DTSC0").trim().toInt(36)
-            target = value.getString(warehouse).trim().toInt(36)
+            product = value.getString("DTSC0").trim().toInt(INT_RADIX)
+            target = value.getString(warehouse).trim().toInt(INT_RADIX)
         }
 
         return Struct(schema)
