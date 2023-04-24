@@ -54,7 +54,7 @@ class EntryTransform<R : ConnectRecord<R>?> : Transformation<R> {
     }
 
     override fun apply(record: R): R = when {
-        operatingValue(record) == null -> {
+        record?.value() == null -> {
             applyKeyOnly(record)
         }
         else -> {
@@ -69,7 +69,7 @@ class EntryTransform<R : ConnectRecord<R>?> : Transformation<R> {
     override fun config(): ConfigDef = CONFIG_DEF
 
     private fun applyKeyOnly(record: R): R {
-        val value = convert(Requirements.requireStruct(record?.key(), PURPOSE))
+        val value = Requirements.requireStruct(record?.key(), PURPOSE)
         val key = Struct(keySchema)
             .put("id", value.getInt32("ROW_ID"))
 
@@ -85,7 +85,7 @@ class EntryTransform<R : ConnectRecord<R>?> : Transformation<R> {
     }
 
     private fun applyWithSchema(record: R): R {
-        val value = convert(Requirements.requireStruct(operatingValue(record), PURPOSE))
+        val value = convert(Requirements.requireStruct(record?.value(), PURPOSE))
         val key = Struct(keySchema)
             .put("id", value.getInt32("id"))
 
@@ -99,8 +99,6 @@ class EntryTransform<R : ConnectRecord<R>?> : Transformation<R> {
             record.timestamp()
         )
     }
-
-    private fun operatingValue(record: R): Any? = record?.value()
 
     private fun convert(value: Struct): Struct
     {
