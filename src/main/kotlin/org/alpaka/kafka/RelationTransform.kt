@@ -37,6 +37,7 @@ class RelationTransform<R : ConnectRecord<R>?> : Transformation<R> {
             .build()
     }
 
+    @Suppress("EmptyFunctionBlock")
     override fun configure(props: Map<String?, *>?) {
     }
 
