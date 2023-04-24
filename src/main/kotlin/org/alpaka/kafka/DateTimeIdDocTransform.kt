@@ -1,6 +1,5 @@
 package org.alpaka.kafka
 
-import org.apache.kafka.common.cache.Cache
 import org.apache.kafka.common.cache.LRUCache
 import org.apache.kafka.common.cache.SynchronizedCache
 import org.apache.kafka.common.config.ConfigDef

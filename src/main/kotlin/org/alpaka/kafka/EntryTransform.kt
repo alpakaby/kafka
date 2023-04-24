@@ -25,22 +25,29 @@ class EntryTransform<R : ConnectRecord<R>?> : Transformation<R> {
         private const val MARK_PRODUCT = 525
         private const val MARK_RESERVE = 53074
         private const val INT_RADIX = 36
+
+        private val keySchema = SchemaBuilder.struct()
+            .name("entry-value")
+            .doc("Entry value")
+            .version(1)
+            .field("id", Schema.INT32_SCHEMA)
+
+        private val valueSchema = SchemaBuilder.struct()
+            .name("entry-value")
+            .doc("Entry value")
+            .version(1)
+            .field("id", Schema.INT32_SCHEMA)
+            .field("date", Date.SCHEMA)
+            .field("product", Schema.INT32_SCHEMA)
+            .field("source", Schema.OPTIONAL_INT32_SCHEMA)
+            .field("target", Schema.OPTIONAL_INT32_SCHEMA)
+            .field("qty", Schema.INT32_SCHEMA)
+            .field("price", Schema.FLOAT32_SCHEMA)
+            .field("reserve", Schema.BOOLEAN_SCHEMA)
+            .build()
     }
 
     private val inputFormatter = SimpleDateFormat("yyyyMMdd")
-    private val schema = SchemaBuilder.struct()
-        .name("entry")
-        .doc("Entry information")
-        .version(1)
-        .field("id", Schema.INT32_SCHEMA)
-        .field("date", Date.SCHEMA)
-        .field("product", Schema.INT32_SCHEMA)
-        .field("source", Schema.OPTIONAL_INT32_SCHEMA)
-        .field("target", Schema.OPTIONAL_INT32_SCHEMA)
-        .field("qty", Schema.INT32_SCHEMA)
-        .field("price", Schema.FLOAT32_SCHEMA)
-        .field("reserve", Schema.BOOLEAN_SCHEMA)
-        .build()
 
     override fun configure(props: Map<String?, *>?) {
         inputFormatter.timeZone = TimeZone.getTimeZone("UTC")
@@ -62,20 +69,20 @@ class EntryTransform<R : ConnectRecord<R>?> : Transformation<R> {
     override fun config(): ConfigDef = CONFIG_DEF
 
     private fun applyWithSchema(record: R): R {
-        val value = Requirements.requireStruct(operatingValue(record), PURPOSE)
+        val value = convert(Requirements.requireStruct(operatingValue(record), PURPOSE))
+        val key = Struct(keySchema)
+            .put("id", value.getInt32("id"))
 
-        return newRecord(record, convert(value))
+        return record!!.newRecord(
+            record.topic(),
+            record.kafkaPartition(),
+            key.schema(),
+            key,
+            value.schema(),
+            value,
+            record.timestamp()
+        )
     }
-
-    private fun newRecord(record: R, updatedValue: Struct): R = record!!.newRecord(
-        record.topic(),
-        record.kafkaPartition(),
-        record.keySchema(),
-        record.key(),
-        updatedValue.schema(),
-        updatedValue,
-        record.timestamp()
-    )
 
     private fun operatingValue(record: R): Any? = record?.value()
 
@@ -114,7 +121,7 @@ class EntryTransform<R : ConnectRecord<R>?> : Transformation<R> {
             target = value.getString(warehouse).trim().toInt(INT_RADIX)
         }
 
-        return Struct(schema)
+        return Struct(valueSchema)
             .put("id", id)
             .put("date", date)
             .put("product", product)

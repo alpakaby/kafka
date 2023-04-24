@@ -55,7 +55,7 @@ publishing {
             version = project.version.toString()
 
             pom {
-                name.set( "phpinncle-toblerone")
+                name.set("alpakaby-kafka")
                 description.set( project.description)
                 url.set("https://github.com/alpakaby/kafka")
                 organization {
