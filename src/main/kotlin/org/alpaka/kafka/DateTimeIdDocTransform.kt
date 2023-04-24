@@ -111,8 +111,8 @@ abstract class DateTimeIdDocTransform<R : ConnectRecord<R>?> : Transformation<R>
     }
 
     private fun convert(value: String): Date {
-        val datePart = value.substring(DATE_PART_START, DATE_PART_END)
-        val timePart = value.substring(DATE_PART_END, TIME_PART_END).toLong(TIME_RADIX) / TIME_ROUND
+        val datePart = value.substring(DATE_PART_START, DATE_PART_END).trim()
+        val timePart = value.substring(DATE_PART_END, TIME_PART_END).trim().toLong(TIME_RADIX) / TIME_ROUND
 
         val date = formatter.parse(datePart).toInstant()
 
