@@ -16,10 +16,10 @@ import kotlin.math.absoluteValue
 class EntryTransform<R : ConnectRecord<R>?> : Transformation<R> {
     companion object {
         const val OVERVIEW_DOC = "Transforms internal 1C 7.7 entries information to leftover table format"
+
         val CONFIG_DEF: ConfigDef = ConfigDef()
 
         private const val PURPOSE = "entry-convert"
-
         private const val DATE_PART_START = 0
         private const val DATE_PART_END = 8
         private const val MARK_PRODUCT = 525
@@ -70,8 +70,7 @@ class EntryTransform<R : ConnectRecord<R>?> : Transformation<R> {
 
     private fun applyKeyOnly(record: R): R {
         val value = Requirements.requireStruct(record?.key(), PURPOSE)
-        val key = Struct(keySchema)
-            .put("id", value.getInt32("ROW_ID"))
+        val key = Struct(keySchema).put("id", value.getInt32("ROW_ID"))
 
         return record!!.newRecord(
             record.topic(),
@@ -86,8 +85,7 @@ class EntryTransform<R : ConnectRecord<R>?> : Transformation<R> {
 
     private fun applyWithSchema(record: R): R {
         val value = convert(Requirements.requireStruct(record?.value(), PURPOSE))
-        val key = Struct(keySchema)
-            .put("id", value.getInt32("id"))
+        val key = Struct(keySchema).put("id", value.getInt32("id"))
 
         return record!!.newRecord(
             record.topic(),
@@ -106,7 +104,10 @@ class EntryTransform<R : ConnectRecord<R>?> : Transformation<R> {
         val date = inputFormatter.parse(value.getString("DATE_TIME_DOCID").substring(DATE_PART_START, DATE_PART_END))
         var reserve = false
         val qty = value.getFloat64("AMOUNT").absoluteValue.toInt()
-        val price = value.getFloat64("SUM_").absoluteValue / qty
+        val price = when (qty) {
+            0 -> 0.0
+            else -> value.getFloat64("SUM_").absoluteValue / qty
+        }
         var product = 0
         var source: Int? = null
         var target: Int? = null
