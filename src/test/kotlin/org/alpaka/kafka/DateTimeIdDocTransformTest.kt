@@ -3,6 +3,7 @@ package org.alpaka.kafka
 import org.apache.kafka.connect.data.Schema
 import org.apache.kafka.connect.data.SchemaBuilder
 import org.apache.kafka.connect.data.Struct
+import org.apache.kafka.connect.data.Timestamp
 import org.apache.kafka.connect.errors.DataException
 import org.apache.kafka.connect.source.SourceRecord
 import org.junit.jupiter.api.AfterEach
@@ -79,8 +80,8 @@ internal class DateTimeIdDocTransformTest {
         assertEquals(schema.version(), transformed.valueSchema().version())
         assertEquals(schema.doc(), transformed.valueSchema().doc())
 
-        assertEquals(Schema.STRING_SCHEMA, transformed.valueSchema().field("DATE_TIME_IDDOC").schema())
-        assertEquals("2023-04-22T15:09:32Z", (transformed.value() as Struct).getString("DATE_TIME_IDDOC"))
+        assertEquals(Timestamp.SCHEMA, transformed.valueSchema().field("DATE_TIME_IDDOC").schema())
+        assertEquals(Date(1682176172000), (transformed.value() as Struct).get("DATE_TIME_IDDOC"))
 
         assertEquals(Schema.STRING_SCHEMA, transformed.valueSchema().field("string").schema())
         assertEquals("string", (transformed.value() as Struct).getString("string"))
@@ -98,7 +99,7 @@ internal class DateTimeIdDocTransformTest {
         val transformed = xformValue.apply(record).value() as Map<*, *>
 
         assertEquals(42, transformed["int32"])
-        assertEquals("2023-04-22T15:09:32Z", transformed["DATE_TIME_IDDOC"])
+        assertEquals(1682176172000, transformed["DATE_TIME_IDDOC"])
     }
 
     @Test

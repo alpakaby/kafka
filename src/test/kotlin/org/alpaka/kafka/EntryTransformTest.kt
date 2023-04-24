@@ -7,6 +7,7 @@ import org.apache.kafka.connect.errors.DataException
 import org.apache.kafka.connect.source.SourceRecord
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Assertions.*
+import java.text.SimpleDateFormat
 import kotlin.test.Test
 
 internal class EntryTransformTest {
@@ -30,6 +31,7 @@ internal class EntryTransformTest {
         .field("VKTSC0", Schema.INT32_SCHEMA)
         .field("VKTSC1", Schema.INT32_SCHEMA)
         .build()
+    private val formatter = SimpleDateFormat("yyyy-MM-dd")
 
     @AfterEach
     fun teardown() {
@@ -91,7 +93,7 @@ internal class EntryTransformTest {
         val actualValue = transformed.value() as Struct
 
         assertEquals(20577887, actualValue.get("id"))
-        assertEquals("2022-02-23", actualValue.get("date"))
+        assertEquals(formatter.parse("2022-02-23"), actualValue.get("date"))
         assertEquals(3357, actualValue.get("product"))
         assertEquals(1, actualValue.get("source"))
         assertEquals(null, actualValue.get("target"))
@@ -123,7 +125,7 @@ internal class EntryTransformTest {
         val actualValue = transformed.value() as Struct
 
         assertEquals(20596674, actualValue.get("id"))
-        assertEquals("2022-02-24", actualValue.get("date"))
+        assertEquals(formatter.parse("2022-02-24"), actualValue.get("date"))
         assertEquals(3357, actualValue.get("product"))
         assertEquals(1, actualValue.get("source"))
         assertEquals(null, actualValue.get("target"))
@@ -155,7 +157,7 @@ internal class EntryTransformTest {
         val actualValue = transformed.value() as Struct
 
         assertEquals(20609335, actualValue.get("id"))
-        assertEquals("2022-02-21", actualValue.get("date"))
+        assertEquals(formatter.parse("2022-02-21"), actualValue.get("date"))
         assertEquals(3357, actualValue.get("product"))
         assertEquals(null, actualValue.get("source"))
         assertEquals(1, actualValue.get("target"))
@@ -187,7 +189,7 @@ internal class EntryTransformTest {
         val actualValue = transformed.value() as Struct
 
         assertEquals(20669593, actualValue.get("id"))
-        assertEquals("2022-03-01", actualValue.get("date"))
+        assertEquals(formatter.parse("2022-03-01"), actualValue.get("date"))
         assertEquals(3357, actualValue.get("product"))
         assertEquals(null, actualValue.get("source"))
         assertEquals(1, actualValue.get("target"))

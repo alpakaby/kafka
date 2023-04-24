@@ -2,6 +2,7 @@ package org.alpaka.kafka
 
 import org.apache.kafka.common.config.ConfigDef
 import org.apache.kafka.connect.connector.ConnectRecord
+import org.apache.kafka.connect.data.Date
 import org.apache.kafka.connect.data.Schema
 import org.apache.kafka.connect.data.SchemaBuilder
 import org.apache.kafka.connect.data.Struct
@@ -27,7 +28,19 @@ class EntryTransform<R : ConnectRecord<R>?> : Transformation<R> {
     }
 
     private val inputFormatter = SimpleDateFormat("yyyyMMdd")
-    private val outputFormatter = SimpleDateFormat("yyyy-MM-dd")
+    private val schema = SchemaBuilder.struct()
+        .name("entry")
+        .doc("Entry information")
+        .version(1)
+        .field("id", Schema.INT32_SCHEMA)
+        .field("date", Date.SCHEMA)
+        .field("product", Schema.INT32_SCHEMA)
+        .field("source", Schema.OPTIONAL_INT32_SCHEMA)
+        .field("target", Schema.OPTIONAL_INT32_SCHEMA)
+        .field("qty", Schema.INT32_SCHEMA)
+        .field("price", Schema.FLOAT32_SCHEMA)
+        .field("reserve", Schema.BOOLEAN_SCHEMA)
+        .build()
 
     override fun configure(props: Map<String?, *>?) {
         inputFormatter.timeZone = TimeZone.getTimeZone("UTC")
@@ -68,20 +81,6 @@ class EntryTransform<R : ConnectRecord<R>?> : Transformation<R> {
 
     private fun convert(value: Struct): Struct
     {
-        val schema = SchemaBuilder.struct()
-            .name("entry")
-            .doc("Entry information")
-            .version(1)
-            .field("id", Schema.INT32_SCHEMA)
-            .field("date", Schema.STRING_SCHEMA)
-            .field("product", Schema.INT32_SCHEMA)
-            .field("source", Schema.OPTIONAL_INT32_SCHEMA)
-            .field("target", Schema.OPTIONAL_INT32_SCHEMA)
-            .field("qty", Schema.INT32_SCHEMA)
-            .field("price", Schema.FLOAT32_SCHEMA)
-            .field("reserve", Schema.BOOLEAN_SCHEMA)
-            .build()
-
         val id = value.getInt32("ROW_ID")
         val date = inputFormatter.parse(value.getString("DATE_TIME_DOCID").substring(DATE_PART_START, DATE_PART_END))
         var reserve = false
@@ -117,7 +116,7 @@ class EntryTransform<R : ConnectRecord<R>?> : Transformation<R> {
 
         return Struct(schema)
             .put("id", id)
-            .put("date", outputFormatter.format(date))
+            .put("date", date)
             .put("product", product)
             .put("source", source)
             .put("target", target)

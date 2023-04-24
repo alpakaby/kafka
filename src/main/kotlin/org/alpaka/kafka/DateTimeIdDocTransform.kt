@@ -1,10 +1,16 @@
 package org.alpaka.kafka
 
+import org.apache.kafka.common.cache.Cache
+import org.apache.kafka.common.cache.LRUCache
+import org.apache.kafka.common.cache.SynchronizedCache
 import org.apache.kafka.common.config.ConfigDef
 import org.apache.kafka.connect.connector.ConnectRecord
 import org.apache.kafka.connect.data.Schema
+import org.apache.kafka.connect.data.Struct
+import org.apache.kafka.connect.data.Timestamp
 import org.apache.kafka.connect.transforms.Transformation
 import org.apache.kafka.connect.transforms.util.Requirements
+import org.apache.kafka.connect.transforms.util.SchemaUtil
 import org.apache.kafka.connect.transforms.util.SimpleConfig
 import java.text.SimpleDateFormat
 import java.util.*
@@ -28,6 +34,8 @@ abstract class DateTimeIdDocTransform<R : ConnectRecord<R>?> : Transformation<R>
                 ConfigDef.Importance.LOW,
                 "Timezone to parse"
             )
+
+        private val cache = SynchronizedCache(LRUCache<Schema, Schema>(16))
 
         private const val PURPOSE = "date-time-iddoc-convert"
 
@@ -76,7 +84,7 @@ abstract class DateTimeIdDocTransform<R : ConnectRecord<R>?> : Transformation<R>
         val value = Requirements.requireMap(operatingValue(record), PURPOSE)
 
         if (value.containsKey(_field) && value[_field] is String) {
-            value[_field] = convert(value[_field] as String)
+            value[_field] = convert(value[_field] as String).time
         }
 
         return newRecord(record, null, value)
@@ -86,24 +94,53 @@ abstract class DateTimeIdDocTransform<R : ConnectRecord<R>?> : Transformation<R>
         val value = Requirements.requireStruct(operatingValue(record), PURPOSE)
         val schema = operatingSchema(record) ?: return record
 
+        val outputSchema = copySchema(schema)
+        val outputValue = Struct(outputSchema)
+
         for (field in schema.fields()) {
             val name = field.name()
 
             if (name == _field) {
-                value.put(name, convert(value.getString(name)))
+                outputValue.put(name, convert(value.getString(name)))
+            } else {
+                outputValue.put(name, value.get(name))
             }
         }
 
-        return newRecord(record, schema, value)
+        return newRecord(record, outputSchema, outputValue)
     }
 
-    private fun convert(value: String): String {
+    private fun convert(value: String): Date {
         val datePart = value.substring(DATE_PART_START, DATE_PART_END)
         val timePart = value.substring(DATE_PART_END, TIME_PART_END).toLong(TIME_RADIX) / TIME_ROUND
 
         val date = formatter.parse(datePart).toInstant()
 
-        return date.plusSeconds(timePart).toString()
+        return Date(date.plusSeconds(timePart).toEpochMilli())
+    }
+
+    private fun copySchema(schema: Schema): Schema {
+        val cached = cache.get(schema)
+
+        if (cached != null) {
+            return cached
+        }
+
+        val output = SchemaUtil.copySchemaBasics(schema)
+
+        for (field in schema.fields()) {
+            val name = field.name()
+
+            if (name == _field) {
+                output.field(name, Timestamp.SCHEMA)
+            } else {
+                output.field(name, field.schema())
+            }
+        }
+
+        cache.put(schema, output)
+
+        return output
     }
 
     class Key<R : ConnectRecord<R>?> : DateTimeIdDocTransform<R>() {
