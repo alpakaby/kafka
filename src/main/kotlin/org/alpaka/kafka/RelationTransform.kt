@@ -43,7 +43,7 @@ class RelationTransform<R : ConnectRecord<R>?> : Transformation<R> {
 
     override fun apply(record: R): R = when {
         operatingValue(record) == null -> {
-            record
+            applyKeyOnly(record)
         }
         else -> {
             applyWithSchema(record)
@@ -56,8 +56,24 @@ class RelationTransform<R : ConnectRecord<R>?> : Transformation<R> {
 
     override fun config(): ConfigDef = CONFIG_DEF
 
+    private fun applyKeyOnly(record: R): R {
+        val value = convert(Requirements.requireStruct(record?.key(), PURPOSE))
+        val key = Struct(keySchema)
+            .put("id", value.getInt32("ROW_ID"))
+
+        return record!!.newRecord(
+            record.topic(),
+            record.kafkaPartition(),
+            key.schema(),
+            key,
+            null,
+            null,
+            record.timestamp()
+        )
+    }
+
     private fun applyWithSchema(record: R): R {
-        val value = convert(Requirements.requireStruct(operatingValue(record), PURPOSE))
+        val value = convert(Requirements.requireStruct(record?.value(), PURPOSE))
         val key = Struct(keySchema)
             .put("id", value.getInt32("id"))
 

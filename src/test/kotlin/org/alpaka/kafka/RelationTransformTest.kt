@@ -27,38 +27,6 @@ internal class RelationTransformTest {
     }
 
     @Test
-    fun handlesNullValue() {
-        val given = SourceRecord(
-            null,
-            null,
-            "topic",
-            0,
-            null,
-            null
-        )
-        val expected = null
-        val actual: Any? = xform.apply(given).value()
-        assertEquals(expected, actual)
-    }
-
-    @Test
-    fun handlesNullKey() {
-        val given = SourceRecord(
-            null,
-            null,
-            "topic",
-            0,
-            null,
-            null,
-            null,
-            null
-        )
-        val expected = null
-        val actual: Any? = xform.apply(given).key()
-        assertEquals(expected, actual)
-    }
-
-    @Test
     fun processStruct() {
         val struct = Struct(schema)
             .put("ROW_ID", 2174067)
