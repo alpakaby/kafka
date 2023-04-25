@@ -103,10 +103,10 @@ class EntryTransform<R : ConnectRecord<R>?> : Transformation<R> {
         val id = value.getInt32("ROW_ID")
         val date = inputFormatter.parse(value.getString("DATE_TIME_DOCID").substring(DATE_PART_START, DATE_PART_END))
         var reserve = false
-        val qty = value.getFloat64("AMOUNT").absoluteValue.toInt()
+        val qty = value.getFloat64("AMOUNT").toInt()
         val price = when (qty) {
             0 -> 0.0
-            else -> value.getFloat64("SUM_").absoluteValue / qty
+            else -> value.getFloat64("SUM_").absoluteValue / qty.absoluteValue
         }
         var product = 0
         var source: Int? = null
