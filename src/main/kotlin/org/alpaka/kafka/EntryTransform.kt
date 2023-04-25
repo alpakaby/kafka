@@ -38,9 +38,10 @@ class EntryTransform<R : ConnectRecord<R>?> : Transformation<R> {
             .version(1)
             .field("id", Schema.INT32_SCHEMA)
             .field("date", Date.SCHEMA)
-            .field("product", Schema.INT32_SCHEMA)
-            .field("source", Schema.OPTIONAL_INT32_SCHEMA)
-            .field("target", Schema.OPTIONAL_INT32_SCHEMA)
+            .field("source_product", Schema.OPTIONAL_INT32_SCHEMA)
+            .field("source_warehouse", Schema.OPTIONAL_INT32_SCHEMA)
+            .field("target_product", Schema.OPTIONAL_INT32_SCHEMA)
+            .field("target_warehouse", Schema.OPTIONAL_INT32_SCHEMA)
             .field("qty", Schema.INT32_SCHEMA)
             .field("price", Schema.FLOAT32_SCHEMA)
             .field("reserve", Schema.BOOLEAN_SCHEMA)
@@ -108,9 +109,11 @@ class EntryTransform<R : ConnectRecord<R>?> : Transformation<R> {
             0 -> 0.0
             else -> value.getFloat64("SUM_").absoluteValue / qty.absoluteValue
         }
-        var product = 0
-        var source: Int? = null
-        var target: Int? = null
+        var sourceProduct: Int? = null
+        var sourceWarehouse: Int? = null
+
+        var targetProduct: Int? = null
+        var targetWarehouse: Int? = null
 
         if (value.getInt32("VKTSC0") == MARK_PRODUCT) {
             reserve = value.getInt32("VKTSC1") == MARK_RESERVE
@@ -120,8 +123,8 @@ class EntryTransform<R : ConnectRecord<R>?> : Transformation<R> {
                 else -> "KTSC1"
             }
 
-            product = value.getString("KTSC0").trim().toInt(INT_RADIX)
-            source = value.getString(warehouse).trim().toInt(INT_RADIX)
+            sourceProduct = value.getString("KTSC0").trim().toInt(INT_RADIX)
+            sourceWarehouse = value.getString(warehouse).trim().toInt(INT_RADIX)
         }
 
         if (value.getInt32("VDTSC0") == MARK_PRODUCT) {
@@ -132,16 +135,17 @@ class EntryTransform<R : ConnectRecord<R>?> : Transformation<R> {
                 else -> "DTSC1"
             }
 
-            product = value.getString("DTSC0").trim().toInt(INT_RADIX)
-            target = value.getString(warehouse).trim().toInt(INT_RADIX)
+            targetProduct = value.getString("DTSC0").trim().toInt(INT_RADIX)
+            targetWarehouse = value.getString(warehouse).trim().toInt(INT_RADIX)
         }
 
         return Struct(valueSchema)
             .put("id", id)
             .put("date", date)
-            .put("product", product)
-            .put("source", source)
-            .put("target", target)
+            .put("source_product", sourceProduct)
+            .put("source_warehouse", sourceWarehouse)
+            .put("target_product", targetProduct)
+            .put("target_warehouse", targetWarehouse)
             .put("qty", qty)
             .put("price", price.round(2).toFloat())
             .put("reserve", reserve)
