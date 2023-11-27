@@ -31,8 +31,8 @@ class RelationTransform<R : ConnectRecord<R>?> : Transformation<R> {
             .doc("Relation value")
             .version(1)
             .field("id", Schema.INT32_SCHEMA)
-            .field("child", Schema.INT32_SCHEMA)
-            .field("parent", Schema.INT32_SCHEMA)
+            .field("child_id", Schema.INT32_SCHEMA)
+            .field("parent_id", Schema.INT32_SCHEMA)
             .field("section", Schema.INT32_SCHEMA)
             .build()
     }
@@ -106,8 +106,8 @@ class RelationTransform<R : ConnectRecord<R>?> : Transformation<R> {
 
         return Struct(valueSchema)
             .put("id", value.getInt32("ROW_ID"))
-            .put("child", child)
-            .put("parent", parent)
+            .put("child_id", child)
+            .put("parent_id", parent)
             .put("section", value.getInt32("MDID"))
     }
 }
