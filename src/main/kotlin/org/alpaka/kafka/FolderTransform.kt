@@ -6,13 +6,10 @@ import org.apache.kafka.common.config.ConfigDef
 import org.apache.kafka.connect.connector.ConnectRecord
 import org.apache.kafka.connect.data.Schema
 import org.apache.kafka.connect.data.Struct
-import org.apache.kafka.connect.data.Timestamp
 import org.apache.kafka.connect.transforms.Transformation
 import org.apache.kafka.connect.transforms.util.Requirements
 import org.apache.kafka.connect.transforms.util.SchemaUtil
 import org.apache.kafka.connect.transforms.util.SimpleConfig
-import java.text.SimpleDateFormat
-import java.util.*
 
 @Suppress("TooManyFunctions")
 abstract class FolderTransform<R : ConnectRecord<R>?> : Transformation<R> {
@@ -93,7 +90,7 @@ abstract class FolderTransform<R : ConnectRecord<R>?> : Transformation<R> {
     }
 
     private fun convert(value: Int): Boolean {
-        return value == 2
+        return value != 2
     }
 
     private fun copySchema(schema: Schema): Schema {
