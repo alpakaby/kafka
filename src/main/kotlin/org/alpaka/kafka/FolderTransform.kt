@@ -90,7 +90,7 @@ abstract class FolderTransform<R : ConnectRecord<R>?> : Transformation<R> {
     }
 
     private fun convert(value: Int): Boolean {
-        return value != 2
+        return value == 1
     }
 
     private fun copySchema(schema: Schema): Schema {
@@ -117,7 +117,7 @@ abstract class FolderTransform<R : ConnectRecord<R>?> : Transformation<R> {
         return output
     }
 
-    class Key<R : ConnectRecord<R>?> : DateTimeIdDocTransform<R>() {
+    class Key<R : ConnectRecord<R>?> : FolderTransform<R>() {
         override fun operatingSchema(record: R?): Schema? = record?.keySchema()
 
         override fun operatingValue(record: R?): Any? = record?.key()
@@ -133,7 +133,7 @@ abstract class FolderTransform<R : ConnectRecord<R>?> : Transformation<R> {
         )
     }
 
-    class Value<R : ConnectRecord<R>?> : DateTimeIdDocTransform<R>() {
+    class Value<R : ConnectRecord<R>?> : FolderTransform<R>() {
         override fun operatingSchema(record: R?): Schema? = record?.valueSchema()
 
         override fun operatingValue(record: R?): Any? = record?.value()
