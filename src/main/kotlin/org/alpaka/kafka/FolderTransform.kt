@@ -62,8 +62,8 @@ abstract class FolderTransform<R : ConnectRecord<R>?> : Transformation<R> {
     private fun applySchemaless(record: R): R {
         val value = Requirements.requireMap(operatingValue(record), PURPOSE)
 
-        if (value.containsKey(_field) && value[_field] is Int) {
-            value[_field] = convert(value[_field] as Int)
+        if (value.containsKey(_field) && value[_field] is Short) {
+            value[_field] = convert(value[_field] as Short)
         }
 
         return newRecord(record, null, value)
@@ -80,7 +80,7 @@ abstract class FolderTransform<R : ConnectRecord<R>?> : Transformation<R> {
             val name = field.name()
 
             if (name == _field) {
-                outputValue.put(name, convert(value.getInt32(name)))
+                outputValue.put(name, convert(value.getInt16(name)))
             } else {
                 outputValue.put(name, value.get(name))
             }
@@ -89,8 +89,8 @@ abstract class FolderTransform<R : ConnectRecord<R>?> : Transformation<R> {
         return newRecord(record, outputSchema, outputValue)
     }
 
-    private fun convert(value: Int): Boolean {
-        return value == 1
+    private fun convert(value: Short): Boolean {
+        return value == 1.toShort()
     }
 
     private fun copySchema(schema: Schema): Schema {
