@@ -38,8 +38,8 @@ internal class RelationTransformTest {
         val actual = xform.apply(original).value() as Struct
 
         assertEquals(2174067, actual.get("id"))
-        assertEquals(721347, actual.get("child"))
-        assertEquals(720990, actual.get("parent"))
+        assertEquals(721347, actual.get("child_id"))
+        assertEquals(720990, actual.get("parent_id"))
         assertEquals(0, actual.get("section"))
     }
 
@@ -55,8 +55,8 @@ internal class RelationTransformTest {
         val actual = xform.apply(original).value() as Struct
 
         assertEquals(2174067, actual.get("id"))
-        assertEquals(721347, actual.get("child"))
-        assertEquals(0, actual.get("parent"))
+        assertEquals(721347, actual.get("child_id"))
+        assertEquals(0, actual.get("parent_id"))
         assertEquals(0, actual.get("section"))
     }
 
