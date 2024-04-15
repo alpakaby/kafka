@@ -128,7 +128,12 @@ class EntryTransform<R : ConnectRecord<R>?> : Transformation<R> {
 
             sourceProduct = value.getString("KTSC0").trim().toInt(INT_RADIX)
             sourceWarehouse = value.getString(warehouse).trim().toInt(INT_RADIX)
-            sourceSeries = value.getString("KTSC3").trim().toInt(INT_RADIX)
+
+            val series = value.getString("KTSC3").trim();
+
+            if (series.isNotEmpty()) {
+                sourceSeries = series.toInt(INT_RADIX)
+            }
         }
 
         if (value.getInt32("VDTSC0") == MARK_PRODUCT) {
@@ -141,7 +146,12 @@ class EntryTransform<R : ConnectRecord<R>?> : Transformation<R> {
 
             targetProduct = value.getString("DTSC0").trim().toInt(INT_RADIX)
             targetWarehouse = value.getString(warehouse).trim().toInt(INT_RADIX)
-            targetSeries = value.getString("DTSC3").trim().toInt(INT_RADIX)
+
+            val series = value.getString("DTSC3").trim();
+
+            if (series.isNotEmpty()) {
+                targetSeries = series.toInt(INT_RADIX)
+            }
         }
 
         return Struct(valueSchema)
