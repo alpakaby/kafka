@@ -31,9 +31,7 @@ dependencies {
     val junitVersion = "5.8.2"
 
     compileOnly(platform("org.jetbrains.kotlin:kotlin-bom")) // Align versions of all Kotlin components
-    compileOnly("org.jetbrains.kotlin:kotlin-stdlib-jdk8") // Use the Kotlin JDK 8 standard library.
 
-    implementation(kotlin("stdlib-jdk8"))
     implementation("org.apache.kafka:connect-api:$kafkaConnectVersion")
     implementation("org.apache.kafka:connect-json:$kafkaConnectVersion")
     implementation("org.apache.kafka:connect-transforms:$kafkaConnectVersion")
@@ -50,10 +48,9 @@ kotlin {
 
 tasks {
     val fatJar = register<Jar>("fatJar") {
-        dependsOn.addAll(listOf("compileJava", "compileKotlin", "processResources")) // We need this for Gradle optimization to work
-        archiveClassifier.set("alpakaby-kafka") // Naming the jar
+        dependsOn.addAll(listOf("compileJava", "compileKotlin", "processResources"))
         duplicatesStrategy = DuplicatesStrategy.EXCLUDE
-        manifest { attributes(mapOf("Main-Class" to "org.alpaka.kafka")) } // Provided we set it up in the application plugin configuration
+        manifest { attributes(mapOf("Main-Class" to "org.alpaka.kafka")) }
         val sourcesMain = sourceSets.main.get()
         val contents = configurations.runtimeClasspath.get()
             .map { if (it.isDirectory) it else zipTree(it) } +
