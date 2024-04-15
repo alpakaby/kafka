@@ -2,7 +2,7 @@
  * User Manual available at https://docs.gradle.org/7.4/userguide/building_java_projects.html
  */
 
-group = "at.willhaben.kafka.connect.transforms.jslt"
+group = "org.alpaka.kafka"
 version = System.getenv("VERSION") ?: "1.0.0"
 
 val javaVersion = 11
@@ -27,7 +27,7 @@ repositories {
 }
 
 dependencies {
-    val kafkaConnectVersion = "3.2.+"
+    val kafkaConnectVersion = "3.7.+"
     val junitVersion = "5.8.2"
 
     compileOnly(platform("org.jetbrains.kotlin:kotlin-bom")) // Align versions of all Kotlin components
@@ -99,4 +99,3 @@ publishing {
         }
     }
 }
-

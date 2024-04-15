@@ -129,7 +129,7 @@ class EntryTransform<R : ConnectRecord<R>?> : Transformation<R> {
             sourceProduct = value.getString("KTSC0").trim().toInt(INT_RADIX)
             sourceWarehouse = value.getString(warehouse).trim().toInt(INT_RADIX)
 
-            val series = value.getString("KTSC3").trim();
+            val series = value.getString("KTSC3").trim()
 
             sourceSeries = if (series.isNotEmpty()) {
                 series.toInt(INT_RADIX)
@@ -149,7 +149,7 @@ class EntryTransform<R : ConnectRecord<R>?> : Transformation<R> {
             targetProduct = value.getString("DTSC0").trim().toInt(INT_RADIX)
             targetWarehouse = value.getString(warehouse).trim().toInt(INT_RADIX)
 
-            val series = value.getString("DTSC3").trim();
+            val series = value.getString("DTSC3").trim()
 
             targetSeries = if (series.isNotEmpty()) {
                 series.toInt(INT_RADIX)
