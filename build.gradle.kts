@@ -47,6 +47,18 @@ kotlin {
     }
 }
 
+tasks.jar {
+    val dependencies = configurations
+        .runtimeClasspath
+        .get()
+        .filter { it.name.contains("kotlin") }
+        .map(::zipTree)
+
+    from(dependencies)
+
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+}
+
 publishing {
     publications {
         create<MavenPublication>("maven") {
