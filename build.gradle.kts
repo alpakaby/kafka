@@ -15,7 +15,7 @@ val artifactoryPassword =
     project.properties.getOrDefault("artifactory_password", System.getenv("ARTIFACTORY_PWD")).toString()
 
 plugins {
-    kotlin("jvm") version "1.6.21"
+    kotlin("jvm") version "1.9.22"
     idea // Generates files that are used by IntelliJ IDEA, thus making it possible to open the project from IDEA
     `java-library` // Apply the java-library plugin for API and implementation separation.
     `maven-publish`
