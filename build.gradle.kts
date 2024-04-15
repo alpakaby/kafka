@@ -33,6 +33,7 @@ dependencies {
     compileOnly(platform("org.jetbrains.kotlin:kotlin-bom")) // Align versions of all Kotlin components
     compileOnly("org.jetbrains.kotlin:kotlin-stdlib-jdk8") // Use the Kotlin JDK 8 standard library.
 
+    implementation(kotlin("stdlib-jdk8"))
     implementation("org.apache.kafka:connect-api:$kafkaConnectVersion")
     implementation("org.apache.kafka:connect-json:$kafkaConnectVersion")
     implementation("org.apache.kafka:connect-transforms:$kafkaConnectVersion")
@@ -45,18 +46,6 @@ kotlin {
     jvmToolchain {
         (this as JavaToolchainSpec).languageVersion.set(JavaLanguageVersion.of(javaVersion))
     }
-}
-
-tasks.jar {
-    val dependencies = configurations
-        .runtimeClasspath
-        .get()
-        .filter { it.name.contains("kotlin") }
-        .map(::zipTree)
-
-    from(dependencies)
-
-    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
 }
 
 publishing {
