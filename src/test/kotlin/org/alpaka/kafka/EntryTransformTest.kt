@@ -68,7 +68,7 @@ internal class EntryTransformTest {
         assertEquals(formatter.parse("2022-02-23"), actualValue.get("date"))
         assertEquals(3357, actualValue.get("source_product"))
         assertEquals(1, actualValue.get("source_warehouse"))
-        assertEquals(null, actualValue.get("source_series"))
+        assertEquals(0, actualValue.get("source_series"))
         assertEquals(null, actualValue.get("target_product"))
         assertEquals(null, actualValue.get("target_warehouse"))
         assertEquals(null, actualValue.get("target_series"))

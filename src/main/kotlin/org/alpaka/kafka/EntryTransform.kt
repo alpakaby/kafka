@@ -131,8 +131,10 @@ class EntryTransform<R : ConnectRecord<R>?> : Transformation<R> {
 
             val series = value.getString("KTSC3").trim();
 
-            if (series.isNotEmpty()) {
-                sourceSeries = series.toInt(INT_RADIX)
+            sourceSeries = if (series.isNotEmpty()) {
+                series.toInt(INT_RADIX)
+            } else {
+                0
             }
         }
 
@@ -149,8 +151,10 @@ class EntryTransform<R : ConnectRecord<R>?> : Transformation<R> {
 
             val series = value.getString("DTSC3").trim();
 
-            if (series.isNotEmpty()) {
-                targetSeries = series.toInt(INT_RADIX)
+            targetSeries = if (series.isNotEmpty()) {
+                series.toInt(INT_RADIX)
+            } else {
+                0
             }
         }
 
