@@ -40,8 +40,10 @@ class EntryTransform<R : ConnectRecord<R>?> : Transformation<R> {
             .field("date", Date.SCHEMA)
             .field("source_product", Schema.OPTIONAL_INT32_SCHEMA)
             .field("source_warehouse", Schema.OPTIONAL_INT32_SCHEMA)
+            .field("source_series", Schema.OPTIONAL_INT32_SCHEMA)
             .field("target_product", Schema.OPTIONAL_INT32_SCHEMA)
             .field("target_warehouse", Schema.OPTIONAL_INT32_SCHEMA)
+            .field("target_series", Schema.OPTIONAL_INT32_SCHEMA)
             .field("qty", Schema.INT32_SCHEMA)
             .field("price", Schema.FLOAT32_SCHEMA)
             .field("reserve", Schema.BOOLEAN_SCHEMA)
@@ -57,8 +59,7 @@ class EntryTransform<R : ConnectRecord<R>?> : Transformation<R> {
     override fun apply(record: R): R = when {
         record?.value() == null -> {
             applyKeyOnly(record)
-        }
-        else -> {
+        } else -> {
             applyWithSchema(record)
         }
     }
@@ -111,9 +112,11 @@ class EntryTransform<R : ConnectRecord<R>?> : Transformation<R> {
         }
         var sourceProduct: Int? = null
         var sourceWarehouse: Int? = null
+        var sourceSeries: Int? = null
 
         var targetProduct: Int? = null
         var targetWarehouse: Int? = null
+        var targetSeries: Int? = null
 
         if (value.getInt32("VKTSC0") == MARK_PRODUCT) {
             reserve = value.getInt32("VKTSC1") == MARK_RESERVE
@@ -125,6 +128,7 @@ class EntryTransform<R : ConnectRecord<R>?> : Transformation<R> {
 
             sourceProduct = value.getString("KTSC0").trim().toInt(INT_RADIX)
             sourceWarehouse = value.getString(warehouse).trim().toInt(INT_RADIX)
+            sourceSeries = value.getString("KTSC3").trim().toInt(INT_RADIX)
         }
 
         if (value.getInt32("VDTSC0") == MARK_PRODUCT) {
@@ -137,6 +141,7 @@ class EntryTransform<R : ConnectRecord<R>?> : Transformation<R> {
 
             targetProduct = value.getString("DTSC0").trim().toInt(INT_RADIX)
             targetWarehouse = value.getString(warehouse).trim().toInt(INT_RADIX)
+            targetSeries = value.getString("DTSC3").trim().toInt(INT_RADIX)
         }
 
         return Struct(valueSchema)
@@ -144,8 +149,10 @@ class EntryTransform<R : ConnectRecord<R>?> : Transformation<R> {
             .put("date", date)
             .put("source_product", sourceProduct)
             .put("source_warehouse", sourceWarehouse)
+            .put("source_series", sourceSeries)
             .put("target_product", targetProduct)
             .put("target_warehouse", targetWarehouse)
+            .put("target_series", targetSeries)
             .put("qty", qty)
             .put("price", price.round(2).toFloat())
             .put("reserve", reserve)
