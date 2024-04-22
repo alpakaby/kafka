@@ -59,7 +59,9 @@ class EntryTransform<R : ConnectRecord<R>?> : Transformation<R> {
     override fun apply(record: R): R = when {
         record?.value() == null -> {
             applyKeyOnly(record)
-        } else -> {
+        }
+
+        else -> {
             applyWithSchema(record)
         }
     }
@@ -100,83 +102,94 @@ class EntryTransform<R : ConnectRecord<R>?> : Transformation<R> {
         )
     }
 
-    private fun convert(value: Struct): Struct
-    {
+    private fun convert(value: Struct): Struct {
         val id = value.getInt32("ROW_ID")
         val date = inputFormatter.parse(value.getString("DATE_TIME_DOCID").substring(DATE_PART_START, DATE_PART_END))
-        var reserve = false
         val qty = value.getFloat64("AMOUNT").toInt()
         val price = when (qty) {
             0 -> 0.0
             else -> value.getFloat64("SUM_").absoluteValue / qty.absoluteValue
         }
-        var sourceProduct: Int? = null
-        var sourceWarehouse: Int? = null
-        var sourceSeries: Int? = null
 
-        var targetProduct: Int? = null
-        var targetWarehouse: Int? = null
-        var targetSeries: Int? = null
-
-        if (value.getInt32("VKTSC0") == MARK_PRODUCT) {
-            reserve = value.getInt32("VKTSC1") == MARK_RESERVE
-
-            val warehouse = when {
-                reserve -> "KTSC2"
-                else -> "KTSC1"
-            }
-
-            val series = when {
-                reserve -> "KTSC3"
-                else -> "KTSC2"
-            }
-
-            val seriesValue = value.getString(series).trim()
-
-            sourceProduct = value.getString("KTSC0").trim().toInt(INT_RADIX)
-            sourceWarehouse = value.getString(warehouse).trim().toInt(INT_RADIX)
-            sourceSeries = if (seriesValue.isNotEmpty()) {
-                seriesValue.toInt(INT_RADIX)
-            } else {
-                0
-            }
-        }
-
-        if (value.getInt32("VDTSC0") == MARK_PRODUCT) {
-            reserve = value.getInt32("VDTSC1") == MARK_RESERVE
-
-            val warehouse = when {
-                reserve -> "DTSC2"
-                else -> "DTSC1"
-            }
-
-            val series = when {
-                reserve -> "DTSC3"
-                else -> "DTSC2"
-            }
-
-            val seriesValue = value.getString(series).trim()
-
-            targetProduct = value.getString("DTSC0").trim().toInt(INT_RADIX)
-            targetWarehouse = value.getString(warehouse).trim().toInt(INT_RADIX)
-            targetSeries = if (seriesValue.isNotEmpty()) {
-                seriesValue.toInt(INT_RADIX)
-            } else {
-                0
-            }
-        }
-
-        return Struct(valueSchema)
+        val result = Struct(valueSchema)
             .put("id", id)
             .put("date", date)
-            .put("source_product", sourceProduct)
-            .put("source_warehouse", sourceWarehouse)
-            .put("source_series", sourceSeries)
+            .put("qty", qty)
+            .put("price", price.round(2).toFloat())
+            .put("reserve", false)
+
+        fillTarget(value, result)
+        fillSource(value, result)
+
+        return result
+    }
+
+    private fun fillTarget(value: Struct, result: Struct)
+    {
+        if (value.getInt32("VDTSC0") != MARK_PRODUCT) {
+            return
+        }
+
+        val reserve = value.getInt32("VDTSC1") == MARK_RESERVE
+
+        val warehouse = when {
+            reserve -> "DTSC2"
+            else -> "DTSC1"
+        }
+
+        val series = when {
+            reserve -> "DTSC3"
+            else -> "DTSC2"
+        }
+
+        val seriesValue = value.getString(series).trim()
+
+        val targetProduct = value.getString("DTSC0").trim().toInt(INT_RADIX)
+        val targetWarehouse = value.getString(warehouse).trim().toInt(INT_RADIX)
+        val targetSeries = if (seriesValue.isNotEmpty()) {
+            seriesValue.toInt(INT_RADIX)
+        } else {
+            0
+        }
+
+        result
             .put("target_product", targetProduct)
             .put("target_warehouse", targetWarehouse)
             .put("target_series", targetSeries)
-            .put("qty", qty)
-            .put("price", price.round(2).toFloat())
+            .put("reserve", reserve)
+    }
+
+    private fun fillSource(value: Struct, result: Struct) {
+        if (value.getInt32("VKTSC0") != MARK_PRODUCT) {
+            return
+        }
+
+        val reserve = value.getInt32("VKTSC1") == MARK_RESERVE
+
+        val warehouse = when {
+            reserve -> "KTSC2"
+            else -> "KTSC1"
+        }
+
+        val series = when {
+            reserve -> "KTSC3"
+            else -> "KTSC2"
+        }
+
+        val seriesValue = value.getString(series).trim()
+
+        val sourceProduct = value.getString("KTSC0").trim().toInt(INT_RADIX)
+        val sourceWarehouse = value.getString(warehouse).trim().toInt(INT_RADIX)
+        val sourceSeries = if (seriesValue.isNotEmpty()) {
+            seriesValue.toInt(INT_RADIX)
+        } else {
+            0
+        }
+
+        result
+            .put("source_product", sourceProduct)
+            .put("source_warehouse", sourceWarehouse)
+            .put("source_series", sourceSeries)
             .put("reserve", reserve)
     }
 
