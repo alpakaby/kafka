@@ -126,13 +126,17 @@ class EntryTransform<R : ConnectRecord<R>?> : Transformation<R> {
                 else -> "KTSC1"
             }
 
+            val series = when {
+                reserve -> "KTSC3"
+                else -> "KTSC2"
+            }
+
+            val seriesValue = value.getString(series).trim()
+
             sourceProduct = value.getString("KTSC0").trim().toInt(INT_RADIX)
             sourceWarehouse = value.getString(warehouse).trim().toInt(INT_RADIX)
-
-            val series = value.getString("KTSC3").trim()
-
-            sourceSeries = if (series.isNotEmpty()) {
-                series.toInt(INT_RADIX)
+            sourceSeries = if (seriesValue.isNotEmpty()) {
+                seriesValue.toInt(INT_RADIX)
             } else {
                 0
             }
@@ -146,13 +150,17 @@ class EntryTransform<R : ConnectRecord<R>?> : Transformation<R> {
                 else -> "DTSC1"
             }
 
+            val series = when {
+                reserve -> "DTSC3"
+                else -> "DTSC2"
+            }
+
+            val seriesValue = value.getString(series).trim()
+
             targetProduct = value.getString("DTSC0").trim().toInt(INT_RADIX)
             targetWarehouse = value.getString(warehouse).trim().toInt(INT_RADIX)
-
-            val series = value.getString("DTSC3").trim()
-
-            targetSeries = if (series.isNotEmpty()) {
-                series.toInt(INT_RADIX)
+            targetSeries = if (seriesValue.isNotEmpty()) {
+                seriesValue.toInt(INT_RADIX)
             } else {
                 0
             }
