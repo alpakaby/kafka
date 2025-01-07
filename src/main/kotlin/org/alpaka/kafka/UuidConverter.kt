@@ -13,22 +13,28 @@ class UuidConverter: CustomConverter<SchemaBuilder, RelationalColumn> {
         .name("io.debezium.data.Uuid")
         .version(1)
 
+    private val columns = arrayOf("_idrref", "_parentidrref")
+
     override fun configure(properties: Properties) {
     }
 
     override fun converterFor(column: RelationalColumn, registration: ConverterRegistration<SchemaBuilder>) {
-        if ("_idrref" == column.name()) {
-            registration.register(schema, fun (x): String {
-                val data = if (x is PGobject) {
-                    x.value?.toByteArray()
-                } else {
-                    x as ByteArray?
-                }
-
-                val buffer = ByteBuffer.wrap(data);
-
-                return UUID(buffer.getLong(), buffer.getLong()).toString()
-            });
+        if (!columns.contains(column.name())) {
+            return
         }
+
+        registration.register(schema, fun (x): String {
+            val data = if (x is PGobject) {
+                x.value?.toByteArray()
+            } else if (x is String) {
+                x.toByteArray()
+            } else {
+                x as ByteArray?
+            }
+
+            val buffer = ByteBuffer.wrap(data)
+
+            return UUID(buffer.getLong(), buffer.getLong()).toString()
+        })
     }
 }
