@@ -23,15 +23,15 @@ class MCharConverter: CustomConverter<SchemaBuilder, RelationalColumn> {
             }
 
             registration.register(schema, fun (x): String? {
-                if (x == null && schema.isOptional) {
-                    return null
-                }
-
                 if (x is PGobject) {
                     return x.value?.let { String(it.toByteArray(), StandardCharsets.UTF_8) }
                 }
 
-                return String(x as ByteArray, StandardCharsets.UTF_8);
+                if (x is String) {
+                    return String(x.toByteArray(), StandardCharsets.UTF_8);
+                }
+
+                return null
             });
         }
     }
