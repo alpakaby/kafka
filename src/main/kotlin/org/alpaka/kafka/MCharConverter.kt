@@ -9,8 +9,6 @@ import java.util.*
 import org.postgresql.util.PGobject
 
 class MCharConverter: CustomConverter<SchemaBuilder, RelationalColumn> {
-    private val decoder = Base64.getDecoder()
-
     override fun configure(properties: Properties) {
     }
 
@@ -23,19 +21,23 @@ class MCharConverter: CustomConverter<SchemaBuilder, RelationalColumn> {
             }
 
             registration.register(schema, fun (x): String? {
-                if (x is PGobject) {
-                    return x.value?.let { String(it.toByteArray(), StandardCharsets.UTF_8) }
-                }
+                when (x) {
+                    is PGobject -> {
+                        return x.value?.let { String(it.toByteArray(), StandardCharsets.UTF_8) }
+                    }
 
-                if (x is String) {
-                    return String(x.toByteArray(), StandardCharsets.UTF_8)
-                }
+                    is String -> {
+                        return String(x.toByteArray(), StandardCharsets.UTF_8)
+                    }
 
-                if (x is ByteArray) {
-                    return String(x, StandardCharsets.UTF_8)
-                }
+                    is ByteArray -> {
+                        return String(x, StandardCharsets.UTF_8)
+                    }
 
-                return null
+                    else -> {
+                        return null
+                    }
+                }
             });
         }
     }

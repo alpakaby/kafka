@@ -39,12 +39,18 @@ class UuidConverter: CustomConverter<SchemaBuilder, RelationalColumn> {
         }
 
         registration.register(schema, fun (x): String {
-            val data = if (x is PGobject) {
-                x.value?.toByteArray()
-            } else if (x is String) {
-                x.toByteArray()
-            } else {
-                x as ByteArray?
+            val data = when (x) {
+                is PGobject -> {
+                    x.value?.toByteArray()
+                }
+
+                is String -> {
+                    x.toByteArray()
+                }
+
+                else -> {
+                    x as ByteArray?
+                }
             }
 
             val buffer = ByteBuffer.wrap(data)
