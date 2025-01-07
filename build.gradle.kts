@@ -5,7 +5,7 @@
 group = "org.alpaka.kafka"
 version = System.getenv("VERSION") ?: "1.0.0"
 
-val javaVersion = 11
+val javaVersion = 17
 
 val artifactoryContext =
     project.properties.getOrDefault("artifactory_context", System.getenv("ARTIFACTORY_CONTEXT")).toString()
@@ -19,7 +19,6 @@ plugins {
     idea // Generates files that are used by IntelliJ IDEA, thus making it possible to open the project from IDEA
     `java-library` // Apply the java-library plugin for API and implementation separation.
     `maven-publish`
-    id("io.gitlab.arturbosch.detekt") version "1.20.0"
 }
 
 repositories {
@@ -28,6 +27,7 @@ repositories {
 
 dependencies {
     val kafkaConnectVersion = "3.7.+"
+    val debeziumVersion = "3.0.6.Final"
     val junitVersion = "5.8.2"
 
     compileOnly(platform("org.jetbrains.kotlin:kotlin-bom")) // Align versions of all Kotlin components
@@ -35,6 +35,7 @@ dependencies {
     implementation("org.apache.kafka:connect-api:$kafkaConnectVersion")
     implementation("org.apache.kafka:connect-json:$kafkaConnectVersion")
     implementation("org.apache.kafka:connect-transforms:$kafkaConnectVersion")
+    implementation("io.debezium:debezium-api:$debeziumVersion")
 
     testImplementation("org.jetbrains.kotlin:kotlin-test-junit")
     testImplementation("org.junit.jupiter:junit-jupiter-api:$junitVersion")
