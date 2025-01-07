@@ -8,15 +8,17 @@ import java.nio.ByteBuffer
 import java.util.*
 
 class UuidConverter: CustomConverter<SchemaBuilder, RelationalColumn> {
-    private val decoder = Base64.getDecoder()
+    private val schema = SchemaBuilder.string()
+        .name("io.debezium.data.Uuid")
+        .version(1)
 
     override fun configure(properties: Properties) {
     }
 
     override fun converterFor(column: RelationalColumn, registration: ConverterRegistration<SchemaBuilder>) {
         if ("_idrref" == column.name()) {
-            registration.register(SchemaBuilder.string(), fun (x): String {
-                val buffer = ByteBuffer.wrap(decoder.decode(x.toString()));
+            registration.register(schema, fun (x): String {
+                val buffer = ByteBuffer.wrap(x as ByteArray?);
 
                 return UUID(buffer.getLong(), buffer.getLong()).toString()
             });

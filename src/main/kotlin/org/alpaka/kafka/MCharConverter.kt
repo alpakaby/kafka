@@ -16,8 +16,18 @@ class MCharConverter: CustomConverter<SchemaBuilder, RelationalColumn> {
 
     override fun converterFor(column: RelationalColumn, registration: ConverterRegistration<SchemaBuilder>) {
         if ("mvarchar" == column.typeName()) {
-            registration.register(SchemaBuilder.string(), fun (x): String {
-                return String(decoder.decode(x.toString()), StandardCharsets.UTF_8);
+            var schema = SchemaBuilder.string()
+
+            if (column.isOptional) {
+                schema = schema.optional()
+            }
+
+            registration.register(schema, fun (x): String? {
+                if (x == null) {
+                    return null
+                }
+
+                return String(x as ByteArray, StandardCharsets.UTF_8);
             });
         }
     }

@@ -29,7 +29,8 @@ internal class MCharConverterTest {
         converter.configure(Properties())
         converter.converterFor(column, registration)
 
-        val input = "0JXQstGA0L4="
+        val decoder = Base64.getDecoder()
+        val input = decoder.decode("0JXQstGA0L4=")
         val result = registration.converter?.convert(input)
 
         assertEquals("Евро", result)

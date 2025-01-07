@@ -29,7 +29,8 @@ internal class UuidConverterTest {
         converter.configure(Properties())
         converter.converterFor(column, registration)
 
-        val input = "hW98wlVlFywR7v8T1kGk8A=="
+        val decoder = Base64.getDecoder()
+        val input = decoder.decode("hW98wlVlFywR7v8T1kGk8A==")
         val result = registration.converter?.convert(input)
 
         assertEquals("856f7cc2-5565-172c-11ee-ff13d641a4f0", result)
