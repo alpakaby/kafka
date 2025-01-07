@@ -28,7 +28,11 @@ class MCharConverter: CustomConverter<SchemaBuilder, RelationalColumn> {
                 }
 
                 if (x is String) {
-                    return String(x.toByteArray(), StandardCharsets.UTF_8);
+                    return String(x.toByteArray(), StandardCharsets.UTF_8)
+                }
+
+                if (x is ByteArray) {
+                    return String(x, StandardCharsets.UTF_8)
                 }
 
                 return null

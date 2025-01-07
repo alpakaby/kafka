@@ -21,7 +21,7 @@ internal class MCharConverterTest {
     }
 
     @Test
-    fun convertBytesToUuid() {
+    fun convertBytesToUtf8() {
         val column = getColumn("_code");
         val registration = MockRegistration<SchemaBuilder>()
         val converter = MCharConverter()
