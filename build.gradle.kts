@@ -28,6 +28,7 @@ repositories {
 dependencies {
     val kafkaConnectVersion = "3.7.+"
     val debeziumVersion = "3.0.6.Final"
+    val postgresVersion = "42.6.1"
     val junitVersion = "5.8.2"
 
     compileOnly(platform("org.jetbrains.kotlin:kotlin-bom")) // Align versions of all Kotlin components
@@ -36,6 +37,7 @@ dependencies {
     implementation("org.apache.kafka:connect-json:$kafkaConnectVersion")
     implementation("org.apache.kafka:connect-transforms:$kafkaConnectVersion")
     implementation("io.debezium:debezium-api:$debeziumVersion")
+    implementation("org.postgresql:postgresql:$postgresVersion")
 
     testImplementation("org.jetbrains.kotlin:kotlin-test-junit")
     testImplementation("org.junit.jupiter:junit-jupiter-api:$junitVersion")
