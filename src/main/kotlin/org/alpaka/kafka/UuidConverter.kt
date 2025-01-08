@@ -11,10 +11,6 @@ import java.nio.ByteBuffer
 import java.util.*
 
 class UuidConverter: CustomConverter<SchemaBuilder, RelationalColumn> {
-    private val schema = SchemaBuilder.string()
-        .name("io.debezium.data.Uuid")
-        .version(1)
-
     private lateinit var columns: List<String>
 
     private val CONFIG_DEF: ConfigDef = ConfigDef()
@@ -36,6 +32,14 @@ class UuidConverter: CustomConverter<SchemaBuilder, RelationalColumn> {
     override fun converterFor(column: RelationalColumn, registration: ConverterRegistration<SchemaBuilder>) {
         if (!columns.contains(column.name())) {
             return
+        }
+
+        var schema = SchemaBuilder.string()
+            .name("io.debezium.data.Uuid")
+            .version(1)
+
+        if (column.isOptional) {
+            schema = schema.optional()
         }
 
         registration.register(schema, fun (x): String? {
