@@ -8,7 +8,7 @@ import java.util.*
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
-internal class UuidConverterTest {
+internal class IntegerConverterTest {
     private class MockRegistration<S> : ConverterRegistration<S> {
         var converter: Converter? = null
         var schema: S? = null
@@ -21,18 +21,20 @@ internal class UuidConverterTest {
 
     @Test
     fun convertBytesToUuid() {
-        val column = getColumn("_idrref");
+        val column = getColumn("test");
         val registration = MockRegistration<SchemaBuilder>()
-        val converter = UuidConverter()
+        val converter = IntegerConverter()
+        val properties = Properties()
 
-        converter.configure(Properties())
+        properties.setProperty("columns", "test")
+
+        converter.configure(properties)
         converter.converterFor(column, registration)
 
-        val decoder = Base64.getDecoder()
-        val input = decoder.decode("hW98wlVlFywR7v8T1kGk8A==")
+        val input = byteArrayOf(0x00, 0x00, 0x02, 0x00)
         val result = registration.converter?.convert(input)
 
-        assertEquals("856f7cc2-5565-172c-11ee-ff13d641a4f0", result)
+        assertEquals(512, result)
     }
 
     private fun getColumn(name: String): RelationalColumn {

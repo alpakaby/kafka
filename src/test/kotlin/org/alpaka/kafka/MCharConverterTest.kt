@@ -8,7 +8,6 @@ import java.util.*
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
-
 internal class MCharConverterTest {
     private class MockRegistration<S> : ConverterRegistration<S> {
         var converter: Converter? = null
