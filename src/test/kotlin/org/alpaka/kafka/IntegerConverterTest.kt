@@ -20,13 +20,13 @@ internal class IntegerConverterTest {
     }
 
     @Test
-    fun convertBytesToUuid() {
+    fun convertBytesToInteger() {
         val column = getColumn("test");
         val registration = MockRegistration<SchemaBuilder>()
         val converter = IntegerConverter()
         val properties = Properties()
 
-        properties.setProperty("columns", "test")
+        properties.setProperty("columns", "public.table.test")
 
         converter.configure(properties)
         converter.converterFor(column, registration)
@@ -47,8 +47,8 @@ internal class IntegerConverterTest {
                 return name
             }
 
-            override fun dataCollection(): String? {
-                return null
+            override fun dataCollection(): String {
+                return "public.table"
             }
 
             override fun typeExpression(): String? {

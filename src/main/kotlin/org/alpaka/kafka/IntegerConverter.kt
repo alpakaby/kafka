@@ -29,7 +29,9 @@ class IntegerConverter: CustomConverter<SchemaBuilder, RelationalColumn> {
     }
 
     override fun converterFor(column: RelationalColumn, registration: ConverterRegistration<SchemaBuilder>) {
-        if (!columns.contains(column.name())) {
+        val name = column.dataCollection() + '.' + column.name()
+
+        if (!columns.contains(name)) {
             return
         }
 

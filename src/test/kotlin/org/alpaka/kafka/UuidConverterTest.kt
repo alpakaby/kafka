@@ -21,11 +21,14 @@ internal class UuidConverterTest {
 
     @Test
     fun convertBytesToUuid() {
-        val column = getColumn("_idrref");
+        val column = getColumn("test");
         val registration = MockRegistration<SchemaBuilder>()
         val converter = UuidConverter()
+        val properties = Properties()
 
-        converter.configure(Properties())
+        properties.setProperty("columns", "public.table.test")
+
+        converter.configure(properties)
         converter.converterFor(column, registration)
 
         val decoder = Base64.getDecoder()
@@ -45,8 +48,8 @@ internal class UuidConverterTest {
                 return name
             }
 
-            override fun dataCollection(): String? {
-                return null
+            override fun dataCollection(): String {
+                return "public.table"
             }
 
             override fun typeExpression(): String? {

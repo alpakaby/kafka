@@ -24,13 +24,14 @@ class UuidConverter: CustomConverter<SchemaBuilder, RelationalColumn> {
 
     override fun configure(properties: Properties) {
         val config = SimpleConfig(CONFIG_DEF, properties)
-        val configured = config.getList("columns")
 
-        columns = listOf("_idrref", "_parentidrref") + configured
+        columns = config.getList("columns")
     }
 
     override fun converterFor(column: RelationalColumn, registration: ConverterRegistration<SchemaBuilder>) {
-        if (!columns.contains(column.name())) {
+        val name = column.dataCollection() + '.' + column.name()
+
+        if (!columns.contains(name)) {
             return
         }
 
