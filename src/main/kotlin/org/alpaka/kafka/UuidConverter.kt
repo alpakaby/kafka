@@ -63,8 +63,20 @@ class UuidConverter: CustomConverter<SchemaBuilder, RelationalColumn> {
             }
 
             val buffer = ByteBuffer.wrap(data)
+            val raw = UUID(buffer.getLong(), buffer.getLong()).toString()
+            var out = ""
 
-            return UUID(buffer.getLong(), buffer.getLong()).toString()
+            out += raw.substring(28)
+            out += '-'
+            out += raw.substring(24, 28)
+            out += '-'
+            out += raw.substring(19, 23)
+            out += '-'
+            out += raw.substring(0, 4)
+            out += '-'
+            out += raw.substring(4, 18).replace("-", "")
+
+            return out
         })
     }
 }

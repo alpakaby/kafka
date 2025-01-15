@@ -4,6 +4,7 @@ import io.debezium.spi.converter.CustomConverter.Converter
 import io.debezium.spi.converter.CustomConverter.ConverterRegistration
 import io.debezium.spi.converter.RelationalColumn
 import org.apache.kafka.connect.data.SchemaBuilder
+import java.nio.ByteBuffer
 import java.util.*
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -31,11 +32,10 @@ internal class UuidConverterTest {
         converter.configure(properties)
         converter.converterFor(column, registration)
 
-        val decoder = Base64.getDecoder()
-        val input = decoder.decode("hW98wlVlFywR7v8T1kGk8A==")
-        val result = registration.converter?.convert(input)
+        val input = UUID.fromString("856f7cc2-5565-172c-11ef-3ce4edeaf984")
+        val result = registration.converter?.convert(uuidToBytes(input))
 
-        assertEquals("856f7cc2-5565-172c-11ee-ff13d641a4f0", result)
+        assertEquals("edeaf984-3ce4-11ef-856f-7cc25565172c", result)
     }
 
     private fun getColumn(name: String): RelationalColumn {
@@ -84,5 +84,12 @@ internal class UuidConverterTest {
                 return null
             }
         }
+    }
+
+    private  fun uuidToBytes(uuid: UUID): ByteArray {
+        val byteBuffer = ByteBuffer.allocate(16)
+        byteBuffer.putLong(uuid.mostSignificantBits)
+        byteBuffer.putLong(uuid.leastSignificantBits)
+        return byteBuffer.array()
     }
 }
