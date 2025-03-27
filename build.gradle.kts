@@ -39,6 +39,8 @@ dependencies {
     implementation("io.debezium:debezium-api:$debeziumVersion")
     implementation("org.postgresql:postgresql:$postgresVersion")
 
+    implementation("com.fasterxml.uuid:java-uuid-generator:5.1.0")
+
     testImplementation("org.jetbrains.kotlin:kotlin-test-junit")
     testImplementation("org.junit.jupiter:junit-jupiter-api:$junitVersion")
 }
