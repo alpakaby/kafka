@@ -40,6 +40,7 @@ dependencies {
     implementation("org.postgresql:postgresql:$postgresVersion")
 
     implementation("com.fasterxml.uuid:java-uuid-generator:5.1.0")
+    implementation("com.ibm.icu:icu4j:75.1")
 
     testImplementation("org.jetbrains.kotlin:kotlin-test-junit")
     testImplementation("org.junit.jupiter:junit-jupiter-api:$junitVersion")
