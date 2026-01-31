@@ -15,6 +15,7 @@ import kotlin.math.absoluteValue
 
 class EntryTransform<R : ConnectRecord<R>?> : Transformation<R> {
     companion object {
+        @Suppress("unused")
         const val OVERVIEW_DOC = "Transforms internal 1C 7.7 entries information to leftover table format"
 
         val CONFIG_DEF: ConfigDef = ConfigDef()

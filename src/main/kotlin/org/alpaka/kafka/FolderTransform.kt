@@ -14,6 +14,7 @@ import org.apache.kafka.connect.transforms.util.SimpleConfig
 @Suppress("TooManyFunctions")
 abstract class FolderTransform<R : ConnectRecord<R>?> : Transformation<R> {
     companion object {
+        @Suppress("unused")
         const val OVERVIEW_DOC = "Convert integer is_folder field to bool value."
 
         val CONFIG_DEF: ConfigDef = ConfigDef()

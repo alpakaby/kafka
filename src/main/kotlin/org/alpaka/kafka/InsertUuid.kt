@@ -20,6 +20,7 @@ import java.util.*
 @Suppress("TooManyFunctions")
 abstract class InsertUuid<R : ConnectRecord<R>?> : Transformation<R> {
     companion object {
+        @Suppress("unused")
         const val OVERVIEW_DOC = "Insert UUID based on specified fields"
 
         val CONFIG_DEF: ConfigDef = ConfigDef()
@@ -89,7 +90,7 @@ abstract class InsertUuid<R : ConnectRecord<R>?> : Transformation<R> {
 
     private fun applySchemaless(record: R): R {
         val value = Requirements.requireMap(operatingValue(record), PURPOSE)
-        val bytes = mutableListOf<Byte>();
+        val bytes = mutableListOf<Byte>()
 
         for (field in _fields) {
             if (!value.containsKey(field)) {

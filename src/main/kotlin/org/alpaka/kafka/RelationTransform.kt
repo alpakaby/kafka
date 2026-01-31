@@ -10,6 +10,7 @@ import org.apache.kafka.connect.transforms.util.Requirements
 
 class RelationTransform<R : ConnectRecord<R>?> : Transformation<R> {
     companion object {
+        @Suppress("unused")
         const val OVERVIEW_DOC = "Transforms internal 1C 7.7 CRDOC information to relation table format"
 
         val CONFIG_DEF: ConfigDef = ConfigDef()

@@ -17,6 +17,7 @@ import java.util.*
 @Suppress("TooManyFunctions")
 abstract class DateTimeIdDocTransform<R : ConnectRecord<R>?> : Transformation<R> {
     companion object {
+        @Suppress("unused")
         const val OVERVIEW_DOC = "Convert internal 1C 7.7 DATE_TIME_IDDOC field to DateTime."
 
         val CONFIG_DEF: ConfigDef = ConfigDef()
