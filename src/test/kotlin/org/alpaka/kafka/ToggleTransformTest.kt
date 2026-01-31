@@ -11,9 +11,9 @@ import java.util.*
 import kotlin.test.Test
 import kotlin.test.assertNull
 
-internal class SlugTransformTest {
-    private val xformKey: SlugTransform<SourceRecord> = SlugTransform.Key()
-    private val xformValue: SlugTransform<SourceRecord> = SlugTransform.Value()
+internal class ToggleTransformTest {
+    private val xformKey: ToggleTransform<SourceRecord> = ToggleTransform.Key()
+    private val xformValue: ToggleTransform<SourceRecord> = ToggleTransform.Value()
 
     @AfterEach
     fun teardown() {
@@ -65,12 +65,12 @@ internal class SlugTransformTest {
             .version(1)
             .doc("doc")
             .field("name", Schema.STRING_SCHEMA)
-            .field("string", Schema.STRING_SCHEMA)
+            .field("is_active", Schema.BOOLEAN_SCHEMA)
             .build()
 
         val value = Struct(valueSchema)
-            .put("name", "Супер пупер товар")
-            .put("string", "test")
+            .put("name", "Test")
+            .put("is_active", false)
 
         val original = SourceRecord(null, null, "test", 0, valueSchema, value)
         val transformed: SourceRecord = xformValue.apply(original)
@@ -82,29 +82,25 @@ internal class SlugTransformTest {
         assertEquals(valueSchema.doc(), transformedSchema.doc())
 
         assertEquals(Schema.STRING_SCHEMA, transformedSchema.field("name").schema())
-        assertEquals("Супер пупер товар", transformedValue.get("name"))
+        assertEquals("Test", transformedValue.get("name"))
 
-        assertEquals(Schema.STRING_SCHEMA, transformedSchema.field("code").schema())
-        assertEquals("super-puper-tovar", transformedValue.get("code"))
-
-        assertEquals(Schema.STRING_SCHEMA, transformedSchema.field("string").schema())
-        assertEquals("test", transformedValue.getString("string"))
+        assertEquals(Schema.BOOLEAN_SCHEMA, transformedSchema.field("is_active").schema())
+        assertEquals(true, transformedValue.getBoolean("is_active"))
     }
 
     @Test
     fun schemalessValueConvertField() {
         configure(xformValue)
         val original = mapOf(
-            "int32" to 42,
-            "name" to "Супер пупер товар"
+            "name" to "Test",
+            "is_active" to false,
         )
 
         val record = SourceRecord(null, null, "test", 0, null, original)
         val transformed = xformValue.apply(record).value() as Map<*, *>
 
-        assertEquals(42, transformed["int32"])
-        assertEquals("Супер пупер товар", transformed["name"])
-        assertEquals("super-puper-tovar", transformed["code"])
+        assertEquals("Test", transformed["name"])
+        assertEquals(true, transformed["is_active"])
     }
 
     @Test
@@ -172,11 +168,10 @@ internal class SlugTransformTest {
         assertNull(transformed.value())
     }
 
-    private fun configure(transform: SlugTransform<SourceRecord>, input: String = "name", output: String = "code") {
+    private fun configure(transform: ToggleTransform<SourceRecord>, input: String = "is_active") {
         val props: MutableMap<String, String> = HashMap()
 
-        props["input"] = input
-        props["output"] = output
+        props["fields"] = input
 
         transform.configure(props.toMap())
     }

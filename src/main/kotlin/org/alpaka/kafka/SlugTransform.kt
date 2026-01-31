@@ -13,12 +13,12 @@ import org.apache.kafka.connect.transforms.Transformation
 import org.apache.kafka.connect.transforms.util.Requirements
 import org.apache.kafka.connect.transforms.util.SchemaUtil
 import org.apache.kafka.connect.transforms.util.SimpleConfig
-import java.text.Normalizer
 import java.util.Locale
 
 @Suppress("TooManyFunctions")
 abstract class SlugTransform<R : ConnectRecord<R>?> : Transformation<R> {
     companion object {
+        @Suppress("unused")
         const val OVERVIEW_DOC = "Insert slug based on specified field"
 
         val CONFIG_DEF: ConfigDef = ConfigDef()
@@ -78,10 +78,7 @@ abstract class SlugTransform<R : ConnectRecord<R>?> : Transformation<R> {
         }
     }
 
-    @Suppress("EmptyFunctionBlock")
-    override fun close() {
-    }
-
+    override fun close() = Unit
     override fun config(): ConfigDef = CONFIG_DEF
 
     protected abstract fun operatingSchema(record: R?): Schema?
